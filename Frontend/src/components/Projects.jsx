@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Building2, Clock, Users, Plus, X, MapPin, Trash2, Edit } from 'lucide-react';
+import { toast, Toaster } from 'react-hot-toast';
 import TaskManager from './TaskManager';
 
 const initialProjects = [

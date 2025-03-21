@@ -13,7 +13,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gray-900/95 top-2 right-6 left-6 rounded-3xl fixed text-white z-50">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div className="container mx-auto px-1 py-3 flex justify-between items-center">
         {/* Logo and Icon */}
         <div className="flex items-center space-x-2">
           {/* Title (hidden on small screens) */}
@@ -27,20 +27,20 @@ const Navbar = () => {
         </div>
 
         {/* Navigation Links (visible on larger screens) */}
-        <div className="hidden sm:flex items-center space-x-8">
+        <div className="hidden w-2/3 sm:flex gap-10 items-center">
           <Link
             to="/"
-            className={`${location.pathname === '/' ? 'text-teal-400' : 'text-white'} hover:text-teal-300`}
+            className={`${location.pathname === '/' ? 'text-teal-400' : 'text-white'} hover:text-teal-300 `}
           >
-            Home
+            HOME
           </Link>
           <Link
             to="/projects"
-            className={`${location.pathname === '/projects' ? 'text-teal-400' : 'text-white'} hover:text-teal-300 uppercase`}
+            className={`${location.pathname === '/projects' ? 'text-teal-400' : 'text-white'} hover:text-teal-300 mr-auto uppercase`}
           >
             Projects
           </Link>
-          <button className="bg-white text-gray-900 px-4 py-2 rounded hover:bg-teal-400 hover:text-white transition-colors">
+          <button className="bg-white ml-auto text-gray-900 px-4 py-2 rounded hover:bg-teal-400 hover:text-white transition-colors">
             Conexion
           </button>
         </div>
