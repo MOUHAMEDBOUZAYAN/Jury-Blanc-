@@ -1,58 +1,89 @@
 const Project = require('../models/Project');
 
-exports.createProject = async (req, res) => {
-  const { name, description, startDate, endDate, budget, createdBy } = req.body;
-
+// @desc    Get all projects
+// @route   GET /api/projects
+// @access  Public
+const getProjects = async (req, res) => {
   try {
-    const project = new Project({ name, description, startDate, endDate, budget, createdBy });
-    await project.save();
-    res.status(201).json(project);
+    const projects = await Project.find().populate('tasks');
+    res.json(projects);
   } catch (error) {
-    res.status(500).json({ message: 'Something went wrong' });
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.getProjects = async (req, res) => {
+// @desc    Create a new project
+// @route   POST /api/projects
+// @access  Public
+const createProject = async (req, res) => {
+  const { title, location, status, completion, team, image } = req.body;
+
   try {
-    const projects = await Project.find().populate('createdBy', 'username');
-    res.status(200).json(projects);
+    const project = new Project({
+      title,
+      location,
+      status,
+      completion,
+      team,
+      image,
+    });
+
+    const savedProject = await project.save();
+    res.status(201).json(savedProject);
   } catch (error) {
-    res.status(500).json({ message: 'Something went wrong' });
+    res.status(400).json({ message: error.message });
   }
 };
 
-exports.getProjectById = async (req, res) => {
+// @desc    Update a project
+// @route   PUT /api/projects/:id
+// @access  Public
+const updateProject = async (req, res) => {
+  const { id } = req.params;
+  const { title, location, status, completion, team, image } = req.body;
+
   try {
-    const project = await Project.findById(req.params.id).populate('createdBy', 'username');
+    const project = await Project.findById(id);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
-    res.status(200).json(project);
+
+    project.title = title || project.title;
+    project.location = location || project.location;
+    project.status = status || project.status;
+    project.completion = completion || project.completion;
+    project.team = team || project.team;
+    project.image = image || project.image;
+
+    const updatedProject = await project.save();
+    res.json(updatedProject);
   } catch (error) {
-    res.status(500).json({ message: 'Something went wrong' });
+    res.status(400).json({ message: error.message });
   }
 };
 
-exports.updateProject = async (req, res) => {
+// @desc    Delete a project
+// @route   DELETE /api/projects/:id
+// @access  Public
+const deleteProject = async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const project = await Project.findById(id);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
-    res.status(200).json(project);
+
+    await project.remove();
+    res.json({ message: 'Project removed' });
   } catch (error) {
-    res.status(500).json({ message: 'Something went wrong' });
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.deleteProject = async (req, res) => {
-  try {
-    const project = await Project.findByIdAndDelete(req.params.id);
-    if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
-    }
-    res.status(200).json({ message: 'Project deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Something went wrong' });
-  }
+module.exports = {
+  getProjects,
+  createProject,
+  updateProject,
+  deleteProject,
 };
