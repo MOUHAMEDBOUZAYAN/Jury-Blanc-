@@ -1,43 +1,12 @@
-import React, { useState } from 'react';
+// src/components/Projects.jsx
+import React, { useState, useEffect } from 'react';
 import { Building2, Clock, Users, Plus, X, MapPin, Trash2, Edit } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import TaskManager from './TaskManager';
-
-const initialProjects = [
-  {
-    id: 1,
-    title: "Modern Office Complex",
-    location: "Downtown Business District",
-    status: "In Progress",
-    completion: "75%",
-    team: 28,
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80",
-    tasks: []
-  },
-  {
-    id: 2,
-    title: "Residential Towers",
-    location: "Riverside Development",
-    status: "Planning",
-    completion: "10%",
-    team: 15,
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80",
-    tasks: []
-  },
-  {
-    id: 3,
-    title: "Shopping Mall Renovation",
-    location: "City Center",
-    status: "Completed",
-    completion: "100%",
-    team: 42,
-    image: "https://images.unsplash.com/photo-1555036803-1c4398e7c997?auto=format&fit=crop&q=80",
-    tasks: []
-  }
-];
+import { getProjects, createProject, updateProject, deleteProject } from '../api';
 
 const Projects = () => {
-  const [projects, setProjects] = useState(initialProjects);
+  const [projects, setProjects] = useState([]);
   const [showAddProject, setShowAddProject] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [editingProject, setEditingProject] = useState(null);
@@ -50,26 +19,44 @@ const Projects = () => {
     image: ''
   });
 
-  const handleAddProject = () => {
-    const project = {
-      id: projects.length + 1,
-      ...newProject,
-      tasks: []
-    };
-    setProjects([...projects, project]);
-    setShowAddProject(false);
-    setNewProject({
-      title: '',
-      location: '',
-      status: 'Planning',
-      completion: '0%',
-      team: 0,
-      image: ''
-    });
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await getProjects();
+      setProjects(response.data);
+    } catch (error) {
+      toast.error('Failed to fetch projects');
+    }
   };
 
-  const handleDeleteProject = (projectId) => {
-    setProjects(projects.filter(p => p.id !== projectId));
+  const handleAddProject = async () => {
+    try {
+      const response = await createProject(newProject);
+      setProjects([...projects, response.data]);
+      setShowAddProject(false);
+      setNewProject({
+        title: '',
+        location: '',
+        status: 'Planning',
+        completion: '0%',
+        team: 0,
+        image: ''
+      });
+    } catch (error) {
+      toast.error('Failed to create project');
+    }
+  };
+
+  const handleDeleteProject = async (projectId) => {
+    try {
+      await deleteProject(projectId);
+      setProjects(projects.filter(p => p.id !== projectId));
+    } catch (error) {
+      toast.error('Failed to delete project');
+    }
   };
 
   const handleEditProject = (project) => {
@@ -85,24 +72,27 @@ const Projects = () => {
     setShowAddProject(true);
   };
 
-  const handleUpdateProject = () => {
+  const handleUpdateProject = async () => {
     if (!editingProject) return;
-    
-    setProjects(projects.map(p => 
-      p.id === editingProject.id 
-        ? { ...p, ...newProject, id: editingProject.id }
-        : p
-    ));
-    setShowAddProject(false);
-    setEditingProject(null);
-    setNewProject({
-      title: '',
-      location: '',
-      status: 'Planning',
-      completion: '0%',
-      team: 0,
-      image: ''
-    });
+
+    try {
+      const response = await updateProject(editingProject.id, newProject);
+      setProjects(projects.map(p => 
+        p.id === editingProject.id ? response.data : p
+      ));
+      setShowAddProject(false);
+      setEditingProject(null);
+      setNewProject({
+        title: '',
+        location: '',
+        status: 'Planning',
+        completion: '0%',
+        team: 0,
+        image: ''
+      });
+    } catch (error) {
+      toast.error('Failed to update project');
+    }
   };
 
   return (

@@ -1,5 +1,7 @@
+// src/components/TaskManager.jsx
 import React, { useState } from 'react';
 import { X, Plus, Trash2, Calendar, CheckCircle, AlertCircle, Clock, Users, Edit } from 'lucide-react';
+import { getTasks, createTask, updateTask, deleteTask } from '../api';
 
 const TaskManager = ({ project, onClose, onUpdate }) => {
   const [tasks, setTasks] = useState(project.tasks || []);
@@ -20,30 +22,25 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
     materials: ''
   });
 
-  const handleAddTask = () => {
-    const task = {
-      id: tasks.length + 1,
-      ...newTask,
-      suppliers: []
-    };
-    const updatedTasks = [...tasks, task];
-    setTasks(updatedTasks);
-    setShowAddTask(false);
-    setNewTask({
-      title: '',
-      description: '',
-      status: 'Pending',
-      startDate: '',
-      endDate: '',
-      resources: '',
-      suppliers: []
-    });
-    
-    const updatedProject = {
-      ...project,
-      tasks: updatedTasks
-    };
-    onUpdate(updatedProject);
+  const handleAddTask = async () => {
+    try {
+      const response = await createTask(project.id, newTask);
+      const updatedTasks = [...tasks, response.data];
+      setTasks(updatedTasks);
+      setShowAddTask(false);
+      setNewTask({
+        title: '',
+        description: '',
+        status: 'Pending',
+        startDate: '',
+        endDate: '',
+        resources: '',
+        suppliers: []
+      });
+      onUpdate({ ...project, tasks: updatedTasks });
+    } catch (error) {
+      console.error('Failed to create task', error);
+    }
   };
 
   const handleEditTask = (task) => {
@@ -60,44 +57,41 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
     setShowAddTask(true);
   };
 
-  const handleUpdateTask = () => {
+  const handleUpdateTask = async () => {
     if (!editingTask) return;
-    
-    const updatedTasks = tasks.map(task =>
-      task.id === editingTask.id
-        ? { ...task, ...newTask, id: editingTask.id, suppliers: task.suppliers }
-        : task
-    );
-    
-    setTasks(updatedTasks);
-    setShowAddTask(false);
-    setEditingTask(null);
-    setNewTask({
-      title: '',
-      description: '',
-      status: 'Pending',
-      startDate: '',
-      endDate: '',
-      resources: '',
-      suppliers: []
-    });
-    
-    const updatedProject = {
-      ...project,
-      tasks: updatedTasks
-    };
-    onUpdate(updatedProject);
+
+    try {
+      const response = await updateTask(editingTask.id, newTask);
+      const updatedTasks = tasks.map(task =>
+        task.id === editingTask.id ? response.data : task
+      );
+      setTasks(updatedTasks);
+      setShowAddTask(false);
+      setEditingTask(null);
+      setNewTask({
+        title: '',
+        description: '',
+        status: 'Pending',
+        startDate: '',
+        endDate: '',
+        resources: '',
+        suppliers: []
+      });
+      onUpdate({ ...project, tasks: updatedTasks });
+    } catch (error) {
+      console.error('Failed to update task', error);
+    }
   };
 
-  const handleDeleteTask = (taskId) => {
-    const updatedTasks = tasks.filter(task => task.id !== taskId);
-    setTasks(updatedTasks);
-    
-    const updatedProject = {
-      ...project,
-      tasks: updatedTasks
-    };
-    onUpdate(updatedProject);
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await deleteTask(taskId);
+      const updatedTasks = tasks.filter(task => task.id !== taskId);
+      setTasks(updatedTasks);
+      onUpdate({ ...project, tasks: updatedTasks });
+    } catch (error) {
+      console.error('Failed to delete task', error);
+    }
   };
 
   const handleAddSupplier = (taskId) => {
@@ -105,7 +99,7 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
       id: Date.now(),
       ...newSupplier
     };
-    
+
     const updatedTasks = tasks.map(task => {
       if (task.id === taskId) {
         return {
@@ -115,19 +109,15 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
       }
       return task;
     });
-    
+
     setTasks(updatedTasks);
     setNewSupplier({
       name: '',
       contact: '',
       materials: ''
     });
-    
-    const updatedProject = {
-      ...project,
-      tasks: updatedTasks
-    };
-    onUpdate(updatedProject);
+
+    onUpdate({ ...project, tasks: updatedTasks });
   };
 
   const handleRemoveSupplier = (taskId, supplierId) => {
@@ -140,13 +130,9 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
       }
       return task;
     });
-    
+
     setTasks(updatedTasks);
-    const updatedProject = {
-      ...project,
-      tasks: updatedTasks
-    };
-    onUpdate(updatedProject);
+    onUpdate({ ...project, tasks: updatedTasks });
   };
 
   const getStatusIcon = (status) => {
