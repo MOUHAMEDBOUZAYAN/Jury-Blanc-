@@ -33,8 +33,55 @@ const Projects = () => {
     }
   };
 
+  // التحقق من صحة المدخلات
+  const validateInputs = () => {
+    const { title, location, status, completion, team, image } = newProject;
+
+    // التحقق من العنوان
+    if (!title || title.trim().length < 3) {
+      toast.error('Title must be at least 3 characters long.');
+      return false;
+    }
+
+    // التحقق من الموقع
+    if (!location || location.trim().length < 3) {
+      toast.error('Location must be at least 3 characters long.');
+      return false;
+    }
+
+    // التحقق من الحالة
+    const validStatuses = ['Planning', 'In Progress', 'Completed'];
+    if (!validStatuses.includes(status)) {
+      toast.error('Invalid status. Must be one of: Planning, In Progress, Completed.');
+      return false;
+    }
+
+    // التحقق من نسبة الإكمال
+    const validCompletions = ['0%', '25%', '50%', '75%', '100%'];
+    if (!validCompletions.includes(completion)) {
+      toast.error('Invalid completion. Must be one of: 0%, 25%, 50%, 75%, 100%.');
+      return false;
+    }
+
+    // التحقق من حجم الفريق
+    if (isNaN(team) || team < 0 || team > 1000) {
+      toast.error('Team size must be a number between 0 and 1000.');
+      return false;
+    }
+
+    // التحقق من رابط الصورة (إذا كان موجودًا)
+    if (image && !/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(image)) {
+      toast.error('Invalid image URL.');
+      return false;
+    }
+
+    return true; // جميع المدخلات صحيحة
+  };
+
   // Ajouter un projet
   const handleAddProject = async () => {
+    if (!validateInputs()) return; // التحقق من صحة المدخلات قبل الإرسال
+
     try {
       const response = await axios.post('http://localhost:5000/api/projects', newProject);
       setProjects([...projects, response.data]);
@@ -53,27 +100,18 @@ const Projects = () => {
     }
   };
 
-  // Supprimer un projet
-  const handleDeleteProject = async (projectId) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/projects/${projectId}`);
-      setProjects(projects.filter(p => p._id !== projectId)); // Utilisez _id au lieu de id
-      toast.success('Project deleted successfully!');
-    } catch (error) {
-      toast.error('Failed to delete project');
-    }
-  };
-
   // Mettre à jour un projet
   const handleUpdateProject = async () => {
     if (!editingProject) return;
 
+    if (!validateInputs()) return; // التحقق من صحة المدخلات قبل الإرسال
+
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/projects/${editingProject._id}`, // Utilisez _id
+        `http://localhost:5000/api/projects/${editingProject._id}`,
         newProject
       );
-      setProjects(projects.map(p => p._id === editingProject._id ? response.data : p)); // Utilisez _id
+      setProjects(projects.map(p => p._id === editingProject._id ? response.data : p));
       setShowAddProject(false);
       setEditingProject(null);
       setNewProject({
@@ -87,6 +125,17 @@ const Projects = () => {
       toast.success('Project updated successfully!');
     } catch (error) {
       toast.error('Failed to update project');
+    }
+  };
+
+  // Supprimer un projet
+  const handleDeleteProject = async (projectId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/projects/${projectId}`);
+      setProjects(projects.filter(p => p._id !== projectId));
+      toast.success('Project deleted successfully!');
+    } catch (error) {
+      toast.error('Failed to delete project');
     }
   };
 
@@ -234,7 +283,7 @@ const Projects = () => {
                     <Edit className="w-5 h-5 text-gray-600" />
                   </button>
                   <button 
-                    onClick={() => handleDeleteProject(project._id)} // Utilisez _id
+                    onClick={() => handleDeleteProject(project._id)}
                     className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
                   >
                     <Trash2 className="w-5 h-5 text-red-500" />
@@ -280,7 +329,7 @@ const Projects = () => {
             onClose={() => setSelectedProject(null)}
             onUpdate={(updatedProject) => {
               setProjects(projects.map(p => 
-                p._id === updatedProject._id ? updatedProject : p // Utilisez _id
+                p._id === updatedProject._id ? updatedProject : p
               ));
               setSelectedProject(null);
             }}
