@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const cors = require('cors'); // Importez le package cors
 const connectDB = require('./config/db');
 const projectRoutes = require('./routes/projectRoutes');
 const taskRoutes = require('./routes/taskRoutes');
@@ -9,6 +10,9 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// Middleware pour autoriser les requêtes CORS
+app.use(cors());
 
 app.use(express.json());
 

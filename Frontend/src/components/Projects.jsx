@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Building2, Clock, Users, Plus, X, MapPin, Trash2, Edit } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import TaskManager from './TaskManager';
-import { getProjects, createProject, updateProject, deleteProject } from '../api';
+import axios from 'axios';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -19,22 +19,24 @@ const Projects = () => {
     image: ''
   });
 
+  // Charger les projets depuis le backend
   useEffect(() => {
     fetchProjects();
   }, []);
 
   const fetchProjects = async () => {
     try {
-      const response = await getProjects();
+      const response = await axios.get('http://localhost:5000/api/projects');
       setProjects(response.data);
     } catch (error) {
       toast.error('Failed to fetch projects');
     }
   };
 
+  // Ajouter un projet
   const handleAddProject = async () => {
     try {
-      const response = await createProject(newProject);
+      const response = await axios.post('http://localhost:5000/api/projects', newProject);
       setProjects([...projects, response.data]);
       setShowAddProject(false);
       setNewProject({
@@ -45,20 +47,50 @@ const Projects = () => {
         team: 0,
         image: ''
       });
+      toast.success('Project added successfully!');
     } catch (error) {
-      toast.error('Failed to create project');
+      toast.error('Failed to add project');
     }
   };
 
+  // Supprimer un projet
   const handleDeleteProject = async (projectId) => {
     try {
-      await deleteProject(projectId);
-      setProjects(projects.filter(p => p.id !== projectId));
+      await axios.delete(`http://localhost:5000/api/projects/${projectId}`);
+      setProjects(projects.filter(p => p._id !== projectId)); // Utilisez _id au lieu de id
+      toast.success('Project deleted successfully!');
     } catch (error) {
       toast.error('Failed to delete project');
     }
   };
 
+  // Mettre à jour un projet
+  const handleUpdateProject = async () => {
+    if (!editingProject) return;
+
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/projects/${editingProject._id}`, // Utilisez _id
+        newProject
+      );
+      setProjects(projects.map(p => p._id === editingProject._id ? response.data : p)); // Utilisez _id
+      setShowAddProject(false);
+      setEditingProject(null);
+      setNewProject({
+        title: '',
+        location: '',
+        status: 'Planning',
+        completion: '0%',
+        team: 0,
+        image: ''
+      });
+      toast.success('Project updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update project');
+    }
+  };
+
+  // Gérer l'édition d'un projet
   const handleEditProject = (project) => {
     setEditingProject(project);
     setNewProject({
@@ -72,36 +104,14 @@ const Projects = () => {
     setShowAddProject(true);
   };
 
-  const handleUpdateProject = async () => {
-    if (!editingProject) return;
-
-    try {
-      const response = await updateProject(editingProject.id, newProject);
-      setProjects(projects.map(p => 
-        p.id === editingProject.id ? response.data : p
-      ));
-      setShowAddProject(false);
-      setEditingProject(null);
-      setNewProject({
-        title: '',
-        location: '',
-        status: 'Planning',
-        completion: '0%',
-        team: 0,
-        image: ''
-      });
-    } catch (error) {
-      toast.error('Failed to update project');
-    }
-  };
-
   return (
-    <main className="min-h-screen w-full pt-20 bg-gray-100">
+    <main className="min-h-screen w-full pt-20 bg-cyan-900">
+      <Toaster /> {/* Pour afficher les notifications */}
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Our Projects</h1>
-            <p className="text-lg text-gray-600">Discover our latest construction projects and developments</p>
+            <h1 className="text-4xl font-bold text-gray-100 mb-2">Our Projects</h1>
+            <p className="text-lg text-gray-100">Discover our latest construction projects and developments</p>
           </div>
           <button
             onClick={() => setShowAddProject(true)}
@@ -211,10 +221,10 @@ const Projects = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project) => (
-            <div key={project.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div key={project._id} className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div 
                 className="h-48 bg-cover bg-center relative"
-                style={{ backgroundImage: `url(${project.image})` }}
+                style={{ backgroundImage: `url(${project.image || 'https://via.placeholder.com/400'})` }} 
               >
                 <div className="absolute top-2 right-2 flex gap-2">
                   <button 
@@ -224,7 +234,7 @@ const Projects = () => {
                     <Edit className="w-5 h-5 text-gray-600" />
                   </button>
                   <button 
-                    onClick={() => handleDeleteProject(project.id)}
+                    onClick={() => handleDeleteProject(project._id)} // Utilisez _id
                     className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
                   >
                     <Trash2 className="w-5 h-5 text-red-500" />
@@ -270,7 +280,7 @@ const Projects = () => {
             onClose={() => setSelectedProject(null)}
             onUpdate={(updatedProject) => {
               setProjects(projects.map(p => 
-                p.id === updatedProject.id ? updatedProject : p
+                p._id === updatedProject._id ? updatedProject : p // Utilisez _id
               ));
               setSelectedProject(null);
             }}
