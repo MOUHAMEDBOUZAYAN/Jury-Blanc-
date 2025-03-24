@@ -27,7 +27,7 @@ const Navbar = () => {
         </div>
 
         {/* Navigation Links (visible on larger screens) */}
-        <div className="hidden w-2/3 sm:flex gap-10 items-center">
+        <div className="hidden w-2/3 sm:flex gap-40 items-center">
           <Link
             to="/"
             className={`${location.pathname === '/' ? 'text-teal-400' : 'text-white'} hover:text-teal-300 `}
@@ -40,9 +40,9 @@ const Navbar = () => {
           >
             Projects
           </Link>
-          <button className="bg-white ml-auto text-gray-900 px-4 py-2 rounded hover:bg-teal-400 hover:text-white transition-colors">
+          {/* <button className="bg-white ml-auto text-gray-900 px-4 py-2 rounded hover:bg-teal-400 hover:text-white transition-colors">
             Conexion
-          </button>
+          </button> */}
         </div>
 
         {/* Mobile Menu Button (visible on small screens) */}
@@ -60,13 +60,13 @@ const Navbar = () => {
       {/* Mobile Menu (visible on small screens when toggled) */}
       {isMenuOpen && (
         <div className="sm:hidden bg-gray-800/95 mt-2 rounded-lg p-4 shadow-lg">
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-4 text-center">
             <Link
               to="/"
-              className={`${location.pathname === '/' ? 'text-teal-400' : 'text-white'} hover:text-teal-300`}
+              className={`${location.pathname === '/' ? 'text-teal-400' : 'text-white'} hover:text-teal-300 `}
               onClick={toggleMenu} // Close menu when a link is clicked
             >
-              Home
+              HOME
             </Link>
             <Link
               to="/projects"
@@ -75,12 +75,12 @@ const Navbar = () => {
             >
               Projects
             </Link>
-            <button
+            {/* <button
               className="bg-white text-gray-900 px-4 py-2 rounded hover:bg-teal-400 hover:text-white transition-colors"
               onClick={toggleMenu} // Close menu when the button is clicked
             >
               Conexion
-            </button>
+            </button> */}
           </div>
         </div>
       )}

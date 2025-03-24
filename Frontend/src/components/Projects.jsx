@@ -1,12 +1,14 @@
 // src/components/Projects.jsx
 import React, { useState, useEffect } from 'react';
-import { Building2, Clock, Users, Plus, X, MapPin, Trash2, Edit } from 'lucide-react';
+import { Building2, Clock, Users, Plus, X, MapPin, Trash2, Edit, Search } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import TaskManager from './TaskManager';
 import axios from 'axios';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showAddProject, setShowAddProject] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [editingProject, setEditingProject] = useState(null);
@@ -24,63 +26,68 @@ const Projects = () => {
     fetchProjects();
   }, []);
 
+  // Filtrer les projets lorsque searchTerm ou projects change
+  useEffect(() => {
+    const filtered = projects.filter(project => 
+      project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.status.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredProjects(filtered);
+  }, [searchTerm, projects]);
+
   const fetchProjects = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/projects');
       setProjects(response.data);
+      setFilteredProjects(response.data); // Initialiser les projets filtrés
     } catch (error) {
       toast.error('Failed to fetch projects');
     }
   };
 
-  // التحقق من صحة المدخلات
+  // Validation des inputs
   const validateInputs = () => {
     const { title, location, status, completion, team, image } = newProject;
 
-    // التحقق من العنوان
     if (!title || title.trim().length < 3) {
       toast.error('Title must be at least 3 characters long.');
       return false;
     }
 
-    // التحقق من الموقع
     if (!location || location.trim().length < 3) {
       toast.error('Location must be at least 3 characters long.');
       return false;
     }
 
-    // التحقق من الحالة
     const validStatuses = ['Planning', 'In Progress', 'Completed'];
     if (!validStatuses.includes(status)) {
       toast.error('Invalid status. Must be one of: Planning, In Progress, Completed.');
       return false;
     }
 
-    // التحقق من نسبة الإكمال
     const validCompletions = ['0%', '25%', '50%', '75%', '100%'];
     if (!validCompletions.includes(completion)) {
       toast.error('Invalid completion. Must be one of: 0%, 25%, 50%, 75%, 100%.');
       return false;
     }
 
-    // التحقق من حجم الفريق
     if (isNaN(team) || team < 0 || team > 1000) {
       toast.error('Team size must be a number between 0 and 1000.');
       return false;
     }
 
-    // التحقق من رابط الصورة (إذا كان موجودًا)
     if (image && !/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(image)) {
       toast.error('Invalid image URL.');
       return false;
     }
 
-    return true; // جميع المدخلات صحيحة
+    return true;
   };
 
   // Ajouter un projet
   const handleAddProject = async () => {
-    if (!validateInputs()) return; // التحقق من صحة المدخلات قبل الإرسال
+    if (!validateInputs()) return;
 
     try {
       const response = await axios.post('http://localhost:5000/api/projects', newProject);
@@ -103,8 +110,7 @@ const Projects = () => {
   // Mettre à jour un projet
   const handleUpdateProject = async () => {
     if (!editingProject) return;
-
-    if (!validateInputs()) return; // التحقق من صحة المدخلات قبل الإرسال
+    if (!validateInputs()) return;
 
     try {
       const response = await axios.put(
@@ -155,7 +161,7 @@ const Projects = () => {
 
   return (
     <main className="min-h-screen w-full pt-20 bg-cyan-900">
-      <Toaster /> {/* Pour afficher les notifications */}
+      <Toaster position='top-right' />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
           <div>
@@ -167,8 +173,22 @@ const Projects = () => {
             className="bg-teal-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-teal-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
-            Add Project
+            Add Projgect
           </button>
+        </div>
+
+        {/* Barre de recherche */}
+        <div className="mb-8 relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search projects by title, location or status..."
+            className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg bg-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
 
         {/* Add/Edit Project Modal */}
@@ -268,8 +288,9 @@ const Projects = () => {
           </div>
         )}
 
+        {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
+          {filteredProjects.map((project) => (
             <div key={project._id} className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div 
                 className="h-48 bg-cover bg-center relative"
@@ -321,6 +342,13 @@ const Projects = () => {
             </div>
           ))}
         </div>
+
+        {/* Message si aucun projet trouvé */}
+        {filteredProjects.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-xl text-gray-100">No projects found matching your search criteria</p>
+          </div>
+        )}
 
         {/* Task Manager Modal */}
         {selectedProject && (

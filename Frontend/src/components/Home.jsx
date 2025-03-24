@@ -30,7 +30,7 @@ const Home = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
-            className="text-xl text-gray-200/90 font-semibold"
+            className="text-xl text-gray-100/90 font-semibold"
           >
             Manage your construction projects efficiently.
           </motion.p>
