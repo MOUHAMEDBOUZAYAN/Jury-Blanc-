@@ -1,7 +1,8 @@
 // src/components/TaskManager.jsx
 import React, { useState } from 'react';
 import { X, Plus, Trash2, Calendar, CheckCircle, AlertCircle, Clock, Users, Edit } from 'lucide-react';
-import { getTasks, createTask, updateTask, deleteTask } from '../api';
+import axios from 'axios'; // استيراد axios مباشرةً
+import { toast, Toaster } from 'react-hot-toast';
 
 const TaskManager = ({ project, onClose, onUpdate }) => {
   const [tasks, setTasks] = useState(project.tasks || []);
@@ -24,7 +25,7 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
 
   const handleAddTask = async () => {
     try {
-      const response = await createTask(project.id, newTask);
+      const response = await axios.post(`http://localhost:5000/api/projects/${project._id}/tasks`, newTask);
       const updatedTasks = [...tasks, response.data];
       setTasks(updatedTasks);
       setShowAddTask(false);
@@ -38,8 +39,10 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
         suppliers: []
       });
       onUpdate({ ...project, tasks: updatedTasks });
+      toast.success('Task added successfully!');
     } catch (error) {
       console.error('Failed to create task', error);
+      toast.error('Failed to add task');
     }
   };
 
@@ -61,9 +64,9 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
     if (!editingTask) return;
 
     try {
-      const response = await updateTask(editingTask.id, newTask);
+      const response = await axios.put(`http://localhost:5000/api/tasks/${editingTask._id}`, newTask);
       const updatedTasks = tasks.map(task =>
-        task.id === editingTask.id ? response.data : task
+        task._id === editingTask._id ? response.data : task
       );
       setTasks(updatedTasks);
       setShowAddTask(false);
@@ -78,19 +81,23 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
         suppliers: []
       });
       onUpdate({ ...project, tasks: updatedTasks });
+      toast.success('Task updated successfully!');
     } catch (error) {
       console.error('Failed to update task', error);
+      toast.error('Failed to update task');
     }
   };
 
   const handleDeleteTask = async (taskId) => {
     try {
-      await deleteTask(taskId);
-      const updatedTasks = tasks.filter(task => task.id !== taskId);
+      await axios.delete(`http://localhost:5000/api/tasks/${taskId}`);
+      const updatedTasks = tasks.filter(task => task._id !== taskId);
       setTasks(updatedTasks);
       onUpdate({ ...project, tasks: updatedTasks });
+      toast.success('Task deleted successfully!');
     } catch (error) {
       console.error('Failed to delete task', error);
+      toast.error('Failed to delete task');
     }
   };
 
@@ -101,7 +108,7 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
     };
 
     const updatedTasks = tasks.map(task => {
-      if (task.id === taskId) {
+      if (task._id === taskId) {
         return {
           ...task,
           suppliers: [...(task.suppliers || []), supplier]
@@ -122,7 +129,7 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
 
   const handleRemoveSupplier = (taskId, supplierId) => {
     const updatedTasks = tasks.map(task => {
-      if (task.id === taskId) {
+      if (task._id === taskId) {
         return {
           ...task,
           suppliers: task.suppliers.filter(s => s.id !== supplierId)
@@ -148,6 +155,7 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <Toaster /> {/* لإظهار الإشعارات */}
       <div className="bg-white rounded-lg p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Task Manager - {project.title}</h2>
@@ -248,7 +256,7 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
         {/* Tasks List */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {tasks.map((task) => (
-            <div key={task.id} className="bg-white border rounded-lg shadow-sm p-4">
+            <div key={task._id} className="bg-white border rounded-lg shadow-sm p-4">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
@@ -265,7 +273,7 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
                     <Edit className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={() => handleDeleteTask(task.id)}
+                    onClick={() => handleDeleteTask(task._id)}
                     className="text-red-500 hover:text-red-700"
                   >
                     <Trash2 className="w-5 h-5" />
@@ -276,14 +284,14 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                 <div className="flex items-center text-gray-600">
                   <Calendar className="w-4 h-4 mr-2" />
-                  <span>Start: {task.startDate}</span>
+                  <span>Start: {new Date(task.startDate).toLocaleDateString()}</span>
                 </div>
                 <div className="flex items-center text-gray-600">
                   <Calendar className="w-4 h-4 mr-2" />
-                  <span>End: {task.endDate}</span>
+                  <span>End: {new Date(task.endDate).toLocaleDateString()}</span>
                 </div>
               </div>
-              
+
               <div className="flex items-center text-gray-600 mt-2">
                 <Users className="w-4 h-4 mr-2" />
                 <span>Resources: {task.resources}</span>
@@ -301,7 +309,7 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
                         <p className="text-sm text-gray-600">Materials: {supplier.materials}</p>
                       </div>
                       <button
-                        onClick={() => handleRemoveSupplier(task.id, supplier.id)}
+                        onClick={() => handleRemoveSupplier(task._id, supplier.id)}
                         className="text-red-500 hover:text-red-700"
                       >
                         <Trash2 className="w-5 h-5" />
@@ -336,7 +344,7 @@ const TaskManager = ({ project, onClose, onUpdate }) => {
                       className="w-full p-2 border rounded-md"
                     />
                     <button
-                      onClick={() => handleAddSupplier(task.id)}
+                      onClick={() => handleAddSupplier(task._id)}
                       className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition-colors"
                     >
                       Add Supplier
