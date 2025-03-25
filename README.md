@@ -19,5 +19,6 @@
 
 ## Diagramme de séquence
 
-<img width="620" alt="image" src="https://github.com/user-attachments/assets/b95e89f8-3977-4f75-9da2-a8818ef0779e" />
+<img width="437" alt="image" src="https://github.com/user-attachments/assets/62b96c04-0d55-4c48-8407-3c8c0c24df9b" />
+
 
