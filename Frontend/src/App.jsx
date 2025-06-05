@@ -5,6 +5,8 @@ import Home from './components/Home';
 import Projects from './components/Projects';
 import Footer from './components/Footer';
 
+
+
 function App() {
   return (
     <Router>
@@ -15,6 +17,7 @@ function App() {
           <Route path="/projects" element={<Projects />} />
         </Routes>
         <Footer />
+         
       </div>
     </Router>
   );

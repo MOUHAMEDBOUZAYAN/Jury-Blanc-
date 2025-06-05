@@ -17,6 +17,8 @@ const Projects = () => {
     location: '',
     status: 'Planning',
     completion: '0%',
+    StartDate:'',
+    EndDate : '',
     team: 0,
     image: ''
   });
@@ -48,7 +50,7 @@ const Projects = () => {
 
   // Validation des inputs
   const validateInputs = () => {
-    const { title, location, status, completion, team, image } = newProject;
+    const { title, location, status, completion,StartDate,EndDate, team, image } = newProject;
 
     if (!title || title.trim().length < 3) {
       toast.error('Title must be at least 3 characters long.');
@@ -71,6 +73,7 @@ const Projects = () => {
       toast.error('Invalid completion. Must be one of: 0%, 25%, 50%, 75%, 100%.');
       return false;
     }
+
 
     if (isNaN(team) || team < 0 || team > 1000) {
       toast.error('Team size must be a number between 0 and 1000.');
@@ -98,6 +101,8 @@ const Projects = () => {
         location: '',
         status: 'Planning',
         completion: '0%',
+        SatrtDate: '',
+        EndDate : '',
         team: 0,
         image: ''
       });
@@ -328,6 +333,10 @@ const Projects = () => {
                   </div>
                   <div className="flex items-center text-gray-700">
                     <Users className="w-5 h-5 mr-2" />
+                    <span>Start Date {project.StartDate} </span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <Users className="w-5 h-5 mr-2" />
                     <span>Team Size: {project.team} members</span>
                   </div>
                 </div>
@@ -365,6 +374,20 @@ const Projects = () => {
         )}
       </div>
     </main>
+
+
+
+//  const project = [{id:12,name:2},{id:13,name:3},{id:14,name:4}];
+//  project.map((items)=>{
+//   return (<><ul>
+//     <li>{items.id}</li>
+//     <li>{items.name}</li>
+//   </ul>
+//   </>)
+//  })
+
+
+
   );
 };
 

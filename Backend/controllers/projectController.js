@@ -16,7 +16,7 @@ const getProjects = async (req, res) => {
 // @route   POST /api/projects
 // @access  Public
 const createProject = async (req, res) => {
-  const { title, location, status, completion, team, image } = req.body;
+  const { title, location, status, completion,StartDate,EndDate, team, image } = req.body;
 
   try {
     const project = new Project({
@@ -24,6 +24,8 @@ const createProject = async (req, res) => {
       location,
       status,
       completion,
+      StartDate,
+      EndDate,
       team,
       image,
     });
@@ -40,7 +42,7 @@ const createProject = async (req, res) => {
 // @access  Public
 const updateProject = async (req, res) => {
   const { id } = req.params;
-  const { title, location, status, completion, team, image } = req.body;
+  const { title, location, status, completion,StartDate,EndDate, team, image } = req.body;
 
   try {
     const project = await Project.findById(id);
@@ -52,6 +54,8 @@ const updateProject = async (req, res) => {
     project.location = location || project.location;
     project.status = status || project.status;
     project.completion = completion || project.completion;
+    project.StartDate = StartDate || project.StartDate;
+    project.EndDate = EndDate || project.EndDate;
     project.team = team || project.team;
     project.image = image || project.image;
 

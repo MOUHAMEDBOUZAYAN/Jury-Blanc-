@@ -17,11 +17,11 @@ const Navbar = () => {
         {/* Logo and Icon */}
         <div className="flex items-center space-x-2">
           {/* Title (hidden on small screens) */}
-          <Link to="/" className="text-xl font-bold sm:hidden">
+          <Link to="/" className="text-xl font-bold hidden sm:block">
             ConstructionXpert
           </Link>
           {/* Icon (shown on small screens) */}
-          <Link to="/" className="hidden sm:block">
+          <Link to="/" className=" sm:hidden">
             <HardHat className="w-6 h-6 text-white hover:text-teal-300" /> {/* Replace with your icon */}
           </Link>
         </div>
