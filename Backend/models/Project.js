@@ -25,15 +25,30 @@ const ProjectSchema = new mongoose.Schema({
   image: {
     type: String,
     default: '',
-  StartDate :{
-     type:date,
-     required:true
   },
-  EndtDate :{
-    type:date,
-    required:true,
- },
-
+  StartDate: {
+    type: Date,
+    required: false
+  },
+  EndDate: {
+    type: Date,
+    required: false,
+  },
+  budget: {
+    type: String,
+    default: '',
+  },
+  client: {
+    type: String,
+    default: '',
+  },
+  description: {
+    type: String,
+    default: '',
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
   tasks: [
     {
