@@ -54,7 +54,17 @@ jury-blanc/
 │   ├── public/              # Fichiers statiques
 │   ├── src/
 │   │   ├── components/      # Composants réutilisables
+│   │   │   ├── Dashboard/   # Tableau de bord
+│   │   │   ├── Jury/        # Gestion des jurys
+│   │   │   ├── Exam/        # Gestion des examens
+│   │   │   ├── User/        # Gestion des utilisateurs
+│   │   │   └── Common/      # Composants partagés
 │   │   ├── pages/          # Pages de l'application
+│   │   │   ├── Login/       # Authentification
+│   │   │   ├── Dashboard/   # Tableau de bord
+│   │   │   ├── Juries/      # Liste des jurys
+│   │   │   ├── Exams/       # Gestion des examens
+│   │   │   └── Reports/     # Rapports et statistiques
 │   │   ├── hooks/          # Hooks personnalisés
 │   │   ├── services/       # Services API
 │   │   ├── utils/          # Utilitaires
@@ -63,7 +73,16 @@ jury-blanc/
 ├── backend/                 # API Node.js/Express
 │   ├── src/
 │   │   ├── controllers/    # Contrôleurs API
+│   │   │   ├── auth.js     # Authentification
+│   │   │   ├── jury.js     # Gestion des jurys
+│   │   │   ├── exam.js     # Gestion des examens
+│   │   │   ├── user.js     # Gestion des utilisateurs
+│   │   │   └── report.js   # Génération de rapports
 │   │   ├── models/         # Modèles MongoDB
+│   │   │   ├── User.js     # Modèle utilisateur
+│   │   │   ├── Jury.js     # Modèle jury
+│   │   │   ├── Exam.js     # Modèle examen
+│   │   │   └── Evaluation.js # Modèle évaluation
 │   │   ├── routes/         # Routes API
 │   │   ├── middleware/     # Middleware personnalisés
 │   │   ├── services/       # Services métier
@@ -116,7 +135,7 @@ jury-blanc/
 
 ```bash
 git clone https://github.com/MOUHAMEDBOUZAYAN/Jury-Blanc-.git
-cd jury-blanc
+cd Jury-Blanc-
 ```
 
 ### 2. Installation Backend
@@ -170,6 +189,10 @@ npm run dev
 cd frontend
 npm start
 ```
+
+L'application sera accessible à :
+- **Frontend** : http://localhost:3000
+- **Backend API** : http://localhost:5000
 
 ### Mode Production
 
@@ -334,6 +357,7 @@ POST /api/auth/login          # Connexion utilisateur
 POST /api/auth/register       # Inscription utilisateur
 POST /api/auth/refresh        # Renouvellement token
 DELETE /api/auth/logout       # Déconnexion
+GET /api/auth/profile         # Profil utilisateur
 ```
 
 #### Gestion des Jurys
@@ -343,12 +367,14 @@ POST /api/juries             # Créer nouveau jury
 GET /api/juries/:id          # Détails d'un jury
 PUT /api/juries/:id          # Modifier jury
 DELETE /api/juries/:id       # Supprimer jury
+POST /api/juries/:id/members # Ajouter membre au jury
 ```
 
-#### Examinations
+#### Gestion des Examens
 ```http
 GET /api/examinations        # Liste des examens
 POST /api/examinations       # Planifier examen
+GET /api/examinations/:id    # Détails d'un examen
 PUT /api/examinations/:id    # Modifier examen
 DELETE /api/examinations/:id # Annuler examen
 ```
@@ -359,9 +385,33 @@ GET /api/evaluations         # Liste évaluations
 POST /api/evaluations        # Créer évaluation
 PUT /api/evaluations/:id     # Modifier évaluation
 GET /api/evaluations/reports # Générer rapports
+GET /api/evaluations/stats   # Statistiques
+```
+
+#### Notifications
+```http
+GET /api/notifications       # Liste des notifications
+POST /api/notifications      # Envoyer notification
+PUT /api/notifications/:id   # Marquer comme lu
+DELETE /api/notifications/:id # Supprimer notification
 ```
 
 ## 🧪 Tests
+
+### Structure des Tests
+
+```
+tests/
+├── backend/
+│   ├── unit/               # Tests unitaires
+│   ├── integration/        # Tests d'intégration
+│   └── e2e/               # Tests end-to-end
+├── frontend/
+│   ├── components/        # Tests des composants
+│   ├── pages/            # Tests des pages
+│   └── services/         # Tests des services
+└── fixtures/             # Données de test
+```
 
 ### Exécution des Tests
 
@@ -407,6 +457,7 @@ EMAIL_PORT=587
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
 CLIENT_URL=http://localhost:3000
+CORS_ORIGIN=http://localhost:3000
 ```
 
 #### Frontend (.env)
@@ -414,6 +465,7 @@ CLIENT_URL=http://localhost:3000
 REACT_APP_API_URL=http://localhost:5000/api
 REACT_APP_APP_NAME=Jury Blanc
 REACT_APP_VERSION=1.0.0
+REACT_APP_DESCRIPTION=Système de Gestion des Jurys d'Examen
 ```
 
 ### Déploiement Docker
@@ -426,6 +478,23 @@ docker-compose build
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
+### Déploiement sur Heroku
+
+```bash
+# Créer une nouvelle application Heroku
+heroku create jury-blanc-app
+
+# Ajouter MongoDB Atlas
+heroku addons:create mongolab:sandbox
+
+# Configurer les variables d'environnement
+heroku config:set NODE_ENV=production
+heroku config:set JWT_SECRET=your-secret-key
+
+# Déployer
+git push heroku main
+```
+
 ## 📊 Monitoring et Logs
 
 ```bash
@@ -435,7 +504,26 @@ docker-compose logs -f
 # Logs spécifiques à un service
 docker-compose logs backend
 docker-compose logs frontend
+
+# Monitoring des performances
+npm run monitor
 ```
+
+## 🔒 Sécurité
+
+### Mesures de Sécurité Implémentées
+- **Authentification JWT** - Tokens sécurisés avec expiration
+- **Hachage des mots de passe** - Utilisation de bcrypt
+- **Validation des données** - Sanitisation des entrées
+- **CORS configuré** - Protection contre les attaques cross-origin
+- **Limitation du taux de requêtes** - Protection contre le spam
+- **HTTPS obligatoire** - Chiffrement des communications
+
+### Bonnes Pratiques
+- Utiliser des mots de passe forts
+- Mettre à jour régulièrement les dépendances
+- Sauvegarder régulièrement la base de données
+- Surveiller les logs d'erreurs
 
 ## 🤝 Contribution
 
@@ -443,23 +531,20 @@ Nous accueillons les contributions de la communauté ! Voici comment participer 
 
 ### 1. Fork du Projet
 ```bash
-git fork https://github.com/MOUHAMEDBOUZAYAN/Jury-Blanc-.git
-```
-
-### 2. Créer une Branche
-```bash
+git clone https://github.com/MOUHAMEDBOUZAYAN/Jury-Blanc-.git
+cd Jury-Blanc-
 git checkout -b feature/nouvelle-fonctionnalite
 ```
 
-### 3. Standards de Code
+### 2. Standards de Code
 - Suivre les conventions ESLint configurées
 - Écrire des tests pour les nouvelles fonctionnalités
 - Documenter les changements importants
 - Utiliser des messages de commit descriptifs
 
-### 4. Pull Request
+### 3. Pull Request
 ```bash
-git commit -m "feat: ajouter nouvelle fonctionnalité X"
+git commit -m "feat: ajouter gestion des notes par matière"
 git push origin feature/nouvelle-fonctionnalite
 ```
 
@@ -471,7 +556,7 @@ git push origin feature/nouvelle-fonctionnalite
 
 ### Types de Contributions Acceptées
 - 🐛 Correction de bugs
-- ✨ Nouvelles fonctionnalités
+- ✨ Nouvelles fonctionnalités (gestion des notes, statistiques avancées)
 - 📚 Améliorations de documentation
 - 🎨 Améliorations UI/UX
 - ⚡ Optimisations de performance
@@ -519,6 +604,13 @@ Pour signaler un bug, veuillez créer une [issue GitHub](https://github.com/MOUH
 ### 💡 Demandes de Fonctionnalités
 
 Les suggestions d'améliorations sont les bienvenues ! Utilisez le template d'issue "Feature Request" sur GitHub.
+
+### 📚 Documentation Supplémentaire
+
+- [Guide d'installation détaillé](docs/installation.md)
+- [Documentation API complète](docs/api.md)
+- [Guide du développeur](docs/developer-guide.md)
+- [FAQ](docs/faq.md)
 
 ---
 
