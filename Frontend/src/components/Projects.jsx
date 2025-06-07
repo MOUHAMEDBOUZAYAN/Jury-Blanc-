@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Building2, Clock, Users, Plus, X, MapPin, Trash2, Edit, Search, 
   Filter, SortDesc, Calendar, Eye, Star, TrendingUp, CheckCircle,
-  AlertCircle, BarChart3, Target, Zap, Award, Phone, Mail
+  AlertCircle, BarChart3, Target, Zap, Award, Phone, Mail, AlertTriangle
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import TaskManager from './TaskManager';
@@ -20,6 +20,11 @@ const ProfessionalProjects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [editingProject, setEditingProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // State for confirmation modal
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
+  
   const [stats, setStats] = useState({
     total: 0,
     inProgress: 0,
@@ -178,17 +183,32 @@ const ProfessionalProjects = () => {
     }
   };
 
-  const handleDeleteProject = async (projectId) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) return;
+  // Modified delete function to show confirmation modal
+  const handleDeleteProject = (project) => {
+    setProjectToDelete(project);
+    setShowConfirmation(true);
+  };
+
+  // Confirm deletion function
+  const confirmDeleteProject = async () => {
+    if (!projectToDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/projects/${projectId}`);
-      setProjects(projects.filter(p => p._id !== projectId));
+      await axios.delete(`http://localhost:5000/api/projects/${projectToDelete._id}`);
+      setProjects(projects.filter(p => p._id !== projectToDelete._id));
+      setShowConfirmation(false);
+      setProjectToDelete(null);
       toast.success('Projet supprimé avec succès!');
     } catch (error) {
       toast.error('Erreur lors de la suppression du projet');
       console.error('Delete error:', error);
     }
+  };
+
+  // Cancel deletion
+  const cancelDeleteProject = () => {
+    setShowConfirmation(false);
+    setProjectToDelete(null);
   };
 
   const handleEditProject = (project) => {
@@ -511,7 +531,7 @@ const ProfessionalProjects = () => {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleDeleteProject(project._id)}
+                      onClick={() => handleDeleteProject(project)}
                       className="w-10 h-10 bg-red-500/90 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-all shadow-lg"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -619,6 +639,71 @@ const ProfessionalProjects = () => {
             ))}
           </motion.div>
         )}
+
+        {/* Confirmation Modal */}
+        <AnimatePresence>
+          {showConfirmation && projectToDelete && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl"
+              >
+                <div className="text-center">
+                  {/* Warning Icon */}
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <AlertTriangle className="w-8 h-8 text-red-600" />
+                  </div>
+                  
+                  {/* Title */}
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    Confirmer la suppression
+                  </h3>
+                  
+                  {/* Message */}
+                  <p className="text-gray-600 mb-2">
+                    Êtes-vous sûr de vouloir supprimer le projet
+                  </p>
+                  <p className="text-lg font-semibold text-gray-900 mb-6">
+                    "{projectToDelete.title}" ?
+                  </p>
+                  
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <p className="text-red-800 text-sm">
+                      ⚠️ Cette action est irréversible. Toutes les données associées à ce projet seront définitivement perdues.
+                    </p>
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex gap-4">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={cancelDeleteProject}
+                      className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all"
+                    >
+                      Annuler
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={confirmDeleteProject}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl hover:from-red-600 hover:to-red-700 transition-all shadow-lg"
+                    >
+                      Supprimer
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Add/Edit Project Modal */}
         <AnimatePresence>
