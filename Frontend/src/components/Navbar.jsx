@@ -110,20 +110,20 @@ const ProfessionalNavbar = () => {
   return (
     <>
       {/* Top Bar */}
-      <div className="bg-gray-900 text-white py-2 text-sm">
-        <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center">
-          <div className="flex items-center space-x-6">
+      <div className="bg-gray-900 text-white py-1.5 text-xs fixed w-full z-40 top-0 h-7">
+        <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center h-full">
+          <div className="flex items-center space-x-4">
             <div className="flex items-center">
-              <Phone className="w-4 h-4 mr-2 text-teal-400" />
+              <Phone className="w-3 h-3 mr-1 text-teal-400" />
               <span>+212 6 90 81 56 05</span>
             </div>
             <div className="flex items-center">
-              <Mail className="w-4 h-4 mr-2 text-teal-400" />
+              <Mail className="w-3 h-3 mr-1 text-teal-400" />
               <span>contact@constructionxpert.ma</span>
             </div>
           </div>
           <div className="flex items-center">
-            <Clock className="w-4 h-4 mr-2 text-teal-400" />
+            <Clock className="w-3 h-3 mr-1 text-teal-400" />
             <span>Lun - Ven: 8h00 - 18h00</span>
           </div>
         </div>
@@ -139,19 +139,20 @@ const ProfessionalNavbar = () => {
             ? 'bg-white/95 backdrop-blur-md shadow-2xl border-b border-gray-200' 
             : 'bg-white/90 backdrop-blur-sm'
         }`}
+        style={{ top: '28px' }}
       >
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-2">
             {/* Logo Section */}
             <Link to="/" className="flex items-center space-x-3 group">
               <motion.div
                 whileHover={{ rotate: 5, scale: 1.05 }}
-                className="w-12 h-12 bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg"
+                className="w-10 h-10 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg flex items-center justify-center shadow-lg"
               >
-                <HardHat className="w-7 h-7 text-white" />
+                <HardHat className="w-6 h-6 text-white" />
               </motion.div>
               <div className="hidden sm:block">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                   ConstructionXpert
                 </h1>
                 <p className="text-xs text-gray-500 -mt-1">Solutions Professionnelles</p>
@@ -159,10 +160,10 @@ const ProfessionalNavbar = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-8">
+            <div className="hidden lg:flex items-center space-x-6">
               <Link
                 to="/"
-                className={`relative py-2 px-4 font-medium transition-all duration-300 ${
+                className={`relative py-1 px-3 font-medium transition-all duration-300 ${
                   location.pathname === '/' 
                     ? 'text-teal-600' 
                     : 'text-gray-700 hover:text-teal-600'
@@ -183,7 +184,7 @@ const ProfessionalNavbar = () => {
                 onMouseEnter={() => setIsServicesOpen(true)}
                 onMouseLeave={() => setIsServicesOpen(false)}
               >
-                <button className="flex items-center py-2 px-4 font-medium text-gray-700 hover:text-teal-600 transition-colors">
+                <button className="flex items-center py-1 px-3 font-medium text-gray-700 hover:text-teal-600 transition-colors">
                   Services
                   <ChevronDown className={`ml-1 w-4 h-4 transition-transform ${isServicesOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -235,7 +236,7 @@ const ProfessionalNavbar = () => {
 
               <Link
                 to="/projects"
-                className={`relative py-2 px-4 font-medium transition-all duration-300 ${
+                className={`relative py-1 px-3 font-medium transition-all duration-300 ${
                   location.pathname === '/projects' 
                     ? 'text-teal-600' 
                     : 'text-gray-700 hover:text-teal-600'
@@ -252,14 +253,14 @@ const ProfessionalNavbar = () => {
 
               <Link
                 to="/about"
-                className="py-2 px-4 font-medium text-gray-700 hover:text-teal-600 transition-colors"
+                className="py-1 px-3 font-medium text-gray-700 hover:text-teal-600 transition-colors"
               >
                 À Propos
               </Link>
 
               <Link
                 to="/contact"
-                className="py-2 px-4 font-medium text-gray-700 hover:text-teal-600 transition-colors"
+                className="py-1 px-3 font-medium text-gray-700 hover:text-teal-600 transition-colors"
               >
                 Contact
               </Link>
@@ -271,7 +272,7 @@ const ProfessionalNavbar = () => {
                 href="tel:+212690815605"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold rounded-full hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold rounded-full hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg text-sm"
               >
                 <Phone className="w-4 h-4 mr-2" />
                 Devis Gratuit

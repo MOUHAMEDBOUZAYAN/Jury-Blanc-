@@ -186,7 +186,7 @@ const EnhancedHome = () => {
   return (
     <main className="min-h-screen w-full">
       {/* Hero Section with Slider */}
-      <section className="relative h-screen overflow-hidden">
+      <section className="relative h-screen overflow-hidden pt-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -349,9 +349,9 @@ const EnhancedHome = () => {
                 key={index}
                 variants={itemVariants}
                 whileHover={{ y: -10, scale: 1.02 }}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 group"
+                className="bg-white p-8 shadow-lg hover:shadow-2xl transition-all duration-300 group"
               >
-                <div className={`w-16 h-16 bg-gradient-to-r ${service.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                <div className={`w-16 h-16 bg-gradient-to-r ${service.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                   <service.icon className="w-8 h-8 text-white" />
                 </div>
                 
