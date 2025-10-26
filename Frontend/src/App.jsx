@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Projects from './components/Projects';
 import About from './components/About';
+import Contact from './components/Contact';
 import Footer from './components/Footer';
 
 function App() {
@@ -22,7 +23,7 @@ function App() {
             <Route path="/services/equipes" element={<div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16"><div className="text-center"><h1 className="text-4xl font-bold text-gray-900 mb-4">Équipes Spécialisées</h1><p className="text-gray-600">Page en cours de développement</p></div></div>} />
             <Route path="/services/securite" element={<div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16"><div className="text-center"><h1 className="text-4xl font-bold text-gray-900 mb-4">Sécurité & Conformité</h1><p className="text-gray-600">Page en cours de développement</p></div></div>} />
             <Route path="/services/certifications" element={<div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16"><div className="text-center"><h1 className="text-4xl font-bold text-gray-900 mb-4">Certifications</h1><p className="text-gray-600">Page en cours de développement</p></div></div>} />
-            <Route path="/contact" element={<div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16"><div className="text-center"><h1 className="text-4xl font-bold text-gray-900 mb-4">Contact</h1><p className="text-gray-600">Page en cours de développement</p></div></div>} />
+            <Route path="/contact" element={<Contact />} />
             {/* Route 404 - Page non trouvée */}
             <Route path="*" element={
               <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16">
